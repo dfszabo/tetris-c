@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -35,20 +36,9 @@ double gen_range(double start, double end) {
   return result + start;
 }
 
-int main34() {
-  /* Generation #14, Rounds: 1, Current best: 108804
-  #####
-  ARG_1:  330883  ARG_2:  935658  ARG_3:  821186  ARG_4:  722742  ARG_5:  904476
-  ARG_6:  771457
-  #####
+int tetris_main(unsigned *params, bool with_gui);
 
-  Current local time and date: Fri Aug 14 22:57:15 2020 */
-  unsigned int args[6] = {330883, 935658, 821186, 722742, 904476, 771457};
-  tetris_main(args);
-  return 0;
-}
-
-int main() {
+int genetic_main() {
   DNA population[POP_COUNT];
   DNA parents[PARENTS_SIZE];
   DNA best;
@@ -71,7 +61,7 @@ int main() {
     for (int i = 0; i < POP_COUNT; i++) {
       srand(0); // re initializing random numb generator for consistency
 
-      population[i].score = tetris_main(population[i].args);
+      population[i].score = tetris_main(population[i].args, false);
 
       if (population[i].score > best.score && best.score) {
         printf("!->%d<-! ", population[i].score);

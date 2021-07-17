@@ -113,39 +113,57 @@ void draw(Tetris *tetris) {
   SDL_RenderPresent(renderer);
 }
 
-int tetris_main(uint *params) {
-  // is_game_running = init_graphics();
-  is_game_running = true;
+int tetris_main(uint *params, bool with_gui) {
+  if (with_gui)
+    is_game_running = init_graphics();
+  else
+    is_game_running = true;
+
   Tetris tetris = new_tetris(run_count);
 
   round_counter = 0;
   score_accumlator = 0;
 
   while (is_game_running) {
-    //handle_io();
+    if (with_gui)
+      handle_io();
     update(&tetris, params);
-    // draw(&tetris);
-    // usleep(30000);
+    if (with_gui) {
+      draw(&tetris);
+      usleep(30000);
+    }
   }
 
-  // quit_graphics();
+  if (with_gui)
+    quit_graphics();
   uint ret = score_accumlator / run_count;
   printf("score = %d ", ret);
 
   return ret;
 }
 
-int main1234() {
-/* Generation #14, Rounds: 1, Current best: 108804
-#####
-ARG_1:  330883  ARG_2:  935658  ARG_3:  821186  ARG_4:  722742  ARG_5:  904476  ARG_6:  771457
-##### 
-Generation #5, Rounds: 10, Current best: 36858
-#####
-ARG_1:  321313  ARG_2:  892412  ARG_3:  994547  ARG_4:  767593  ARG_5:  850117  ARG_6:  565844
-##### */
-
-  uint params[6] = {143600, 850823, 993919, 396907, 370255, 863207};
-  tetris_main(params);
+// Using the best params found yet
+int single_run(bool with_gui) {
+  uint params[6] = {29185, 186201, 517715, 296899, 90791, 512512};
+  tetris_main(params, with_gui);
   return 0;
+}
+
+int genetic_main();
+
+int main(int argc, char *argv[]) {
+  bool with_gui = false;
+  bool genetic = false;
+
+  for (int i = 1; i < argc; i++) {
+    if (0 == strcmp(argv[i], "-genetic"))
+      genetic = true;
+    else if (0 == strcmp(argv[i], "-gui"))
+      with_gui = true;
+  }
+
+  if (genetic)
+    return genetic_main();
+  else
+    return single_run(with_gui);
 }

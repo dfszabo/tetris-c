@@ -1,7 +1,6 @@
 #include "../includes/tetris.h"
 #include "../includes/constants.h"
-#include <assert.h>
-#include <stdio.h>
+
 
 #define ABS(a, b) (((a) > (b)) ? ((a) - (b)) : ((b) - (a)))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
@@ -80,10 +79,6 @@ bool does_piece_fit(const Tetris *self, const uint kind, const uint rotation,
 }
 
 void remove_filled_line(Tetris *self, uint row_index) {
-  assert(row_index < 20 && row_index > 0 &&
-         "row_index should not be 0 or greater than 19");
-  if (row_index == 0 || row_index > 19)
-    printf("row_index should not be 0 or greater than 19");
   for (uint row = row_index; row > 0; row--)
     for (uint col = 0; col < BOARD_WIDTH; col++)
       self->board[row][col] = self->board[row - 1][col];
@@ -114,12 +109,6 @@ void find_and_remove_filled_lines(Tetris *self) {
   }
 
   for (uint i = 0; i < found_lines; i++) {
-    /*       if (found_lines_indecies[i] + i > 19) {
-            printf("WTF i: %u, found_lines_indecies[%u] = %d, found lines %d\n",
-       i, i, found_lines_indecies[i], found_lines); for (int ii = 0; ii < 4;
-       ii++) printf("found_lines_indecies[%d] = %d" , found_lines_indecies[i],
-       i);
-          } */
     remove_filled_line(self, found_lines_indices[i] + i);
   }
 
@@ -227,7 +216,7 @@ ull board_hole_factor(const Tetris *self) {
     // otherwise count the holes weighted by its depth
     for (uint r = row; r < BOARD_HEIGHT; r++)
       if (self->board[r][col] == 0)
-        hole_factor += row;
+        hole_factor += r;
   }
 
   return hole_factor;
@@ -301,12 +290,12 @@ ull fitness(const Tetris *self, uint *params) {
   ull filledness = board_line_filledness(self);
 
   ull fitness = 1ull << 50;
-  fitness = MAX(fitness - params[0] * 1e+2 * hole_fact, 0);
-  fitness = MAX(fitness - params[1] * 1e+4 * bumpiness, 0);
-  fitness = MAX(fitness - params[2] * 4e+1 * max_height, 0);
-  fitness += params[3] * 4e-2 * continuity;
-  fitness += params[4] * 1e+2 * filledness;
-  fitness += params[5] * 1e+3 * filled_lines;
+  fitness = MAX(fitness - params[0] * 100 * hole_fact, 0);
+  fitness = MAX(fitness - params[1] * 10000 * bumpiness, 0);
+  fitness = MAX(fitness - params[2] * 40 * max_height, 0);
+  fitness += (params[3] * 4 * continuity) / 100;
+  fitness += params[4] * 100 * filledness;
+  fitness += params[5] * 100 * filled_lines;
 
   return fitness;
 }
@@ -320,11 +309,9 @@ uint max_rotation(uint kind) {
   case 6:
     rotation_degree = 2;
     break;
-
   case 4:
     rotation_degree = 1;
     break;
-
   default:
     break;
   }
@@ -333,8 +320,6 @@ uint max_rotation(uint kind) {
 }
 
 Action bot(Tetris *self, uint *params) {
-  /*   printf("Botacs istvan %u, %u, %u, %u, %u, %u\ncurr piece = 0", params[0],
-     params[1], params[2], params[3], params[4], params[5]); */
   const uint kind = self->curr_piece.kind;
   ull best_fitness = 0;
   Piece best_piece = self->curr_piece;
