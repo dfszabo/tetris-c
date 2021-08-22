@@ -1,10 +1,7 @@
 #include "../includes/constants.h"
-#include "../includes/graphics.h"
 #include "../includes/tetris.h"
+#include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-
-extern SDL_Renderer *renderer;
 
 int is_game_running;
 
@@ -12,25 +9,8 @@ Action action = NONE;
 
 uint round_counter = 0;
 uint score_accumlator = 0;
-extern uint run_count;
+uint run_count = 1;
 
-void init_game(Tetris *tetris) {}
-
-void handle_io() {
-  SDL_Event event;
-  SDL_PollEvent(&event);
-
-  switch (event.type) {
-  case SDL_QUIT:
-    is_game_running = FALSE;
-  case SDL_KEYDOWN:
-    if (event.key.keysym.sym == SDLK_ESCAPE)
-      is_game_running = FALSE;
-    break;
-  default:
-    break;
-  }
-}
 
 void try_to_move_down(Tetris *tetris) {
   if (!move_piece_down(tetris)) {
@@ -90,80 +70,29 @@ void update(Tetris *tetris, uint *params) {
     try_to_move_down(tetris);
 }
 
-void draw(Tetris *tetris) {
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-  SDL_RenderClear(renderer);
 
-  add_current_piece(tetris);
-  for (int row = 0; row < BOARD_HEIGHT; row++)
-    for (int col = 0; col < BOARD_WIDTH; col++) {
-      SDL_Rect square = {col * BLOCK_SIZE, row * BLOCK_SIZE, BLOCK_SIZE,
-                         BLOCK_SIZE};
+int tetris_main(uint *params) {
+  is_game_running = true;
 
-      if (tetris->board[row][col] != 0)
-        SDL_SetRenderDrawColor(renderer, 128, 255 / 6 * tetris->board[row][col],
-                               55 / 6 * tetris->board[row][col], 255);
-      else
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-
-      SDL_RenderFillRect(renderer, &square);
-    }
-  remove_current_piece(tetris);
-
-  SDL_RenderPresent(renderer);
-}
-
-int tetris_main(uint *params, bool with_gui) {
-  if (with_gui)
-    is_game_running = init_graphics();
-  else
-    is_game_running = true;
-
-  Tetris tetris = new_tetris(run_count);
+  Tetris tetris = new_tetris();
 
   round_counter = 0;
   score_accumlator = 0;
 
-  while (is_game_running) {
-    if (with_gui)
-      handle_io();
+  while (is_game_running)
     update(&tetris, params);
-    if (with_gui) {
-      draw(&tetris);
-      usleep(30000);
-    }
-  }
 
-  if (with_gui)
-    quit_graphics();
   uint ret = score_accumlator / run_count;
-  printf("score = %d ", ret);
-
+  printf("ret %u\n", ret);
   return ret;
 }
 
 // Using the best params found yet
-int single_run(bool with_gui) {
-  uint params[6] = {29185, 186201, 517715, 296899, 90791, 512512};
-  tetris_main(params, with_gui);
-  return 0;
+int single_run() {
+  uint params[6] = {1, 1, 1, 1, 1, 1};
+  return tetris_main(params);
 }
 
-int genetic_main();
-
 int main(int argc, char *argv[]) {
-  bool with_gui = false;
-  bool genetic = false;
-
-  for (int i = 1; i < argc; i++) {
-    if (0 == strcmp(argv[i], "-genetic"))
-      genetic = true;
-    else if (0 == strcmp(argv[i], "-gui"))
-      with_gui = true;
-  }
-
-  if (genetic)
-    return genetic_main();
-  else
-    return single_run(with_gui);
+  return !(single_run() == 419);
 }

@@ -1,8 +1,8 @@
 build:
-	gcc -std=c99 -Wall ./src/*.c -o Tetris -lSDL2 -O3
+	gcc -std=c99 -Wall ./src/*.c -o Tetris -O3
 
 debug:
-	gcc -std=c99 -Wall ./src/*.c -o Tetris -lSDL2 -g
+	gcc -std=c99 -Wall ./src/*.c -o Tetris -g
 
 clean:
 	rm Tetris

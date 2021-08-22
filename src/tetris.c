@@ -14,8 +14,6 @@ const unsigned char tetrominos[7][16] = {
     {0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0},
     {0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0}};
 
-uint run_count = 3;
-
 Tetris new_tetris() {
   Tetris tetris;
 

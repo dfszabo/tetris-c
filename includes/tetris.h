@@ -1,7 +1,9 @@
 #ifndef TETRIS_H
 #define TETRIS_H
 
-#include <stdbool.h>
+#define bool int
+#define true 1
+#define false 0
 
 typedef unsigned int uint;
 typedef unsigned long long ull;
